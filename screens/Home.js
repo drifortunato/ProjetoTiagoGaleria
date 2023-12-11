@@ -20,7 +20,7 @@ export default function Home({ navigation }) {
 
     useEffect(() => {
         db.transaction((tx) => {
-            tx.executeSql("create table if not exists viagem (id integer primary key not null, nome text not null)");
+            tx.executeSql("create table if not exists viagem (id integer primary key not null, nome text not null, inicio text not null, fim text not null)");
         });
     }, []);
 
@@ -60,6 +60,8 @@ export default function Home({ navigation }) {
                 >
                     <View style={{ width: "100%" }}>
                         <Text style={styles.text}>Viagem : {item.nome}</Text>
+                        <Text style={styles.text}>Inicio : {item.inicio}</Text>
+                        <Text style={styles.text}>Fim : {item.fim}</Text>
                     </View>
                 </Pressable>
             </View >

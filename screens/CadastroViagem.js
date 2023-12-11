@@ -21,7 +21,7 @@ export default function CadastroViagem({ navigation }) {
         db.transaction((tx) => {
             tx.executeSql("insert into viagem (nome) values (?)", [nome]);
         });
-        updateTotal();  
+        updateTotal();
         navigation.navigate("home", { atualizar: true });
     }
 
