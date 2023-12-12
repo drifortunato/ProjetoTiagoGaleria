@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as SQLite from 'expo-sqlite';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { useRoute } from '@react-navigation/native';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 const Stack = createNativeStackNavigator();
 const ListContext = createContext(null);
@@ -13,12 +14,22 @@ const db = SQLite.openDatabase("viagem.db");
 export default function Home({ navigation }) {
     const [data, setData] = useState(null);
     const [busy, setBusy] = useState(false);
-    const [update, setUpdate] = useState(true);
+    const [update, setUpdate] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const route = useRoute();
     const listProvider = useContext(ListContext);
+    const [autenticado, setAutenticado] = useState(false);
+
+
+    const autenticar = async () => {
+        const auth = await LocalAuthentication.authenticateAsync({
+            promptMessage: 'Por favor, realize a autenticação.'
+        });
+        setAutenticado(auth.success);
+    }
 
     useEffect(() => {
+        // autenticar(),
         db.transaction((tx) => {
             tx.executeSql("create table if not exists viagem (id integer primary key not null, nome text not null, inicio text not null, fim text not null)");
         });
@@ -27,7 +38,7 @@ export default function Home({ navigation }) {
     let [flatListItems, setFlatListItems] = useState([]);
 
     useEffect(() => {
-        if (update || route.params?.atualizar) {
+        if (update || route.params?.atualizar || autenticado) {
             db.transaction((tx) => {
                 tx.executeSql(
                     'SELECT * FROM VIAGEM',
@@ -43,7 +54,7 @@ export default function Home({ navigation }) {
             });
             setUpdate(false);
         }
-    }, [update, route]);
+    }, [update, route, autenticado]);
 
     let listItemView = (item, rowMap) => {
         return (
@@ -59,9 +70,11 @@ export default function Home({ navigation }) {
                     onPress={() => navigation.navigate('listalugar', { id: item.id })}
                 >
                     <View style={{ width: "100%" }}>
-                        <Text style={styles.text}>Viagem : {item.nome}</Text>
-                        <Text style={styles.text}>Inicio : {item.inicio}</Text>
-                        <Text style={styles.text}>Fim : {item.fim}</Text>
+                        <Text style={styles.baseText}>
+                            Viagem :
+                            <Text style={styles.innerText}> {item.nome}</Text>
+                        </Text>
+                        <Text style={styles.textStyle}>Inicio : {item.inicio}   Fim : {item.fim}</Text>
                     </View>
                 </Pressable>
             </View >
@@ -78,28 +91,37 @@ export default function Home({ navigation }) {
     const DelButton = ({ data, rowMap }) => {
         const context = useContext(ListContext);
         return (
-            <Button title="Excluir" status={{ left: 0 }} color="crimson" onPress={() => {
-                Alert.alert(
-                    'Excluir viagem',
-                    'Deseja realmente excluir esta Viagem ?',
-                    [
-                        {
-                            text: "Não", style: 'cancel',
-                            onPress: () => { }
-                        },
-                        {
-                            text: 'Sim', style: 'destructive',
-                            onPress: () => {
-                                db.transaction((tx) => {
-                                    tx.executeSql("delete from viagem where id = (?)", [data.item.id]);
-                                });
-                                closeRow(rowMap, data.item.id);
-                                setUpdate(true);
+            <TouchableOpacity
+                style={[styles.rightAction, { backgroundColor: 'red' }]}
+                onPress={() => {
+                    Alert.alert(
+                        'Excluir viagem ',
+                        'Deseja realmente excluir esta Viagem ?',
+                        [
+                            {
+                                text: "Não", style: 'cancel',
+                                onPress: () => { }
+                            },
+                            {
+                                text: 'Sim', style: 'destructive',
+                                onPress: () => {
+                                    db.transaction((tx) => {
+                                        tx.executeSql("delete from viagem where id = (?)", [data.item.id]);
+                                    });
+                                    closeRow(rowMap, data.item.id);
+                                    setUpdate(true);
+                                }
                             }
-                        }
-                    ]
-                );
-            }} />
+                        ]
+                    );
+                }}
+            >
+                <Image
+                    source={require('./tash.png')}
+                    style={{ width: 50, height: 50 }}
+                />
+            </TouchableOpacity>
+
         )
     }
 
@@ -110,7 +132,7 @@ export default function Home({ navigation }) {
     };
 
     const onRefresh = () => {
-        setUpdate(true);
+        autenticar()
     };
 
     return (
@@ -132,6 +154,7 @@ export default function Home({ navigation }) {
                         }
                     />
                     <TouchableOpacity
+                        disabled={!autenticado}
                         activeOpacity={0.7}
                         onPress={() => navigation.push("cadastroviagem")}
                         style={styles.touchableOpacityStyle}>
@@ -151,12 +174,13 @@ export default function Home({ navigation }) {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         backgroundColor: '#2728D',
-        padding: 10,
         alignItems: 'center',
+        padding: 10,
+        flex: 1,
         justifyContent: 'center',
-    },
+        height: 60,               
+    },    
     titleStyle: {
         fontSize: 28,
         fontWeight: 'bold',
@@ -165,8 +189,7 @@ const styles = StyleSheet.create({
     },
     textStyle: {
         fontSize: 16,
-        textAlign: 'center',
-        padding: 10,
+        padding: 5,
     },
     touchableOpacityStyle: {
         position: 'absolute',
@@ -204,7 +227,11 @@ const styles = StyleSheet.create({
         height: 60,
         paddingLeft: 20
     },
-    text: {
-        fontSize: 18,
+    baseText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    innerText: {
+        color: 'red',
     },
 });

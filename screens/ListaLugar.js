@@ -58,9 +58,18 @@ export default function ListaLugar({ navigation, route }) {
                     onPress={() => navigation.navigate('galeriafoto', { idlugar: item.id })}
                 >
                     <View style={{ width: "100%" }}>
-                        <Text style={styles.text}>Lugar.....: {item.nome}</Text>
-                        <Text style={styles.text}>Detalhes..: {item.descricao}</Text>
-                        <Text style={styles.text}>Data......: {item.data}</Text>
+                        <Text style={styles.baseText}>
+                            Lugar :
+                            <Text style={styles.innerText}> {item.nome}</Text>
+                        </Text>
+                        <Text style={styles.baseText}>
+                        Detalhes :
+                            <Text style={styles.innerText}> {item.descricao}</Text>
+                        </Text>
+                        <Text style={styles.baseText}>
+                            Data :
+                            <Text style={styles.innerText}> {item.data}</Text>
+                        </Text>                        
                     </View>
                 </Pressable>
             </View >
@@ -165,10 +174,10 @@ export default function ListaLugar({ navigation, route }) {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         backgroundColor: '#2728D',
-        padding: 10,
         alignItems: 'center',
+        padding: 10,
+        flex: 1,
         justifyContent: 'center',
     },
     titleStyle: {
@@ -217,7 +226,11 @@ const styles = StyleSheet.create({
         height: 60,
         paddingLeft: 10,
     },
-    text: {
+    baseText: {
         fontSize: 16,
+        fontWeight: 'bold',
+    },
+    innerText: {
+        color: 'red',
     },
 });

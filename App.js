@@ -12,13 +12,13 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='home'>
-        <Stack.Screen name='home' component={Home} options={{ title: 'Galeria de Viagens' }} />
-        <Stack.Screen name='cadastroviagem' component={CadastroViagem} options={{title: 'Cadastro de Viagem '}}/>
-        <Stack.Screen name='cadastrolugar' component={CadastroLugar} options={{title: 'Cadastro de Lugares '}}/>
-        <Stack.Screen name='listalugar' component={ListaLugar} options={{title: 'Lista de Lugares '}}/>
-        <Stack.Screen name='galeriafoto' component={GaleriaFoto} options={{title: 'Galeria de Fotos'}}/>
-      </Stack.Navigator>
+    <Stack.Navigator initialRouteName='home'>
+      <Stack.Screen name='home' component={Home} options={{ title: 'Galeria de Viagens' }} />
+      <Stack.Screen name='cadastroviagem' component={CadastroViagem} options={{ title: 'Cadastro de Viagem ' }} />
+      <Stack.Screen name='cadastrolugar' component={CadastroLugar} options={{ title: 'Cadastro de Lugares ' }} />
+      <Stack.Screen name='listalugar' component={ListaLugar} options={{ title: 'Lista de Lugares ' }} />
+      <Stack.Screen name='galeriafoto' component={GaleriaFoto} options={{ title: 'Galeria de Fotos' }} />
+    </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
   );
