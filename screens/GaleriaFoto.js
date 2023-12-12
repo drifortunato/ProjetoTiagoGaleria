@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Button, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { Image } from 'expo-image';
 import * as SQLite from 'expo-sqlite';
 import { SwipeListView } from 'react-native-swipe-list-view';
@@ -68,14 +68,6 @@ export default function GaleriaFoto({ navigation, route }) {
         );
     };
 
-    const showAll = () => {
-        db.transaction((tx) => {
-            tx.executeSql("select foto from fotoimg", [], (trans, results) => {
-                alert(JSON.stringify(results.rows._array));
-            });
-        })
-    }
-
     const addFoto = () => {
         db.transaction((tx) => {
             tx.executeSql("insert into fotoimg (idlocal,foto) values (?,?)", [idfoto, imagem], (tx, results) => {
@@ -110,24 +102,66 @@ export default function GaleriaFoto({ navigation, route }) {
         }
     }, [salvar]);
 
+
     const onRefresh = () => {
         setUpdate(true);
     };
+
+    const BackitemLista = (data, rowMap) => (
+        <View style={styles.itemFundo}>
+            <DelButton data={data} rowMap={rowMap} />
+        </View>
+    );
+
+    const DelButton = ({ data, rowMap }) => {
+        const context = useContext(ListContext);
+        return (
+            <TouchableOpacity
+                style={[styles.rightAction, { backgroundColor: 'red' }]}
+                onPress={() => {
+                Alert.alert(
+                    'Excluir foto',
+                    'Deseja realmente excluir esta Foto ?',
+                    [
+                        {
+                            text: "Não", style: 'cancel',
+                            onPress: () => { }
+                        },
+                        {
+                            text: 'Sim', style: 'destructive',
+                            onPress: () => {
+                                db.transaction((tx) => {
+                                    tx.executeSql("delete from fotoimg where id = (?)", [data.item.id]);
+                                });
+                                onRefresh();
+                            }
+                        }
+                    ]
+                );
+            }} 
+            >
+                <Image
+                    source={require('./tash.png')}
+                    style={{ width: 40, height: 40 }}
+                />
+            </TouchableOpacity>            
+        )
+    }
 
     return (
         <SafeAreaView style={styles.container}>
             <ListContext.Provider value={{ setBusy: setBusy, listItemView: listItemView }}>
                 <View style={styles.topo}>
-                    <Button title='Escolher imagem' onPress={chooseImage} />
+                    <Button title='Carregar imagem' color="#2196F3" mode="contained" onPress={chooseImage} />
                     <SwipeListView
                         data={data}
                         renderItem={({ item }) => listItemView(item)}
+                        renderHiddenItem={BackitemLista}
                         leftOpenValue={80}
                         rightOpenValue={-72}
                         keyExtractor={item => item.id}
                         style={{ height: "100%" }}
                     />
-                    <Button title='Exibir todos' onPress={showAll} />
                 </View>
             </ListContext.Provider>
         </SafeAreaView>
@@ -151,5 +185,18 @@ const styles = StyleSheet.create({
         width: 320,
         height: 180,
     },
-
+    topo: {
+        marginTop: 30,
+        width: "100%",
+    },
+    itemFundo: {
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        borderBottomColor: '#ccc',
+        borderBottomWidth: 1,
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 4,
+    },
 });
