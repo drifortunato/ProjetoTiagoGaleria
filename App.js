@@ -6,6 +6,8 @@ import CadastroViagem from './screens/CadastroViagem';
 import CadastroLugar from './screens/CadastroLugar';
 import ListaLugar from './screens/ListaLugar';
 import GaleriaFoto from './screens/GaleriaFoto';
+import EditarLugar from './screens/EditarLugar';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +20,7 @@ export default function App() {
       <Stack.Screen name='cadastrolugar' component={CadastroLugar} options={{ title: 'Cadastro de Lugares ' }} />
       <Stack.Screen name='listalugar' component={ListaLugar} options={{ title: 'Lista de Lugares ' }} />
       <Stack.Screen name='galeriafoto' component={GaleriaFoto} options={{ title: 'Galeria de Fotos' }} />
+      <Stack.Screen name='editarlugar' component={EditarLugar} options={{ title: 'Editar Local' }} />
     </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>

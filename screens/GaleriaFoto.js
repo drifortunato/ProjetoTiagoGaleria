@@ -119,40 +119,46 @@ export default function GaleriaFoto({ navigation, route }) {
             <TouchableOpacity
                 style={[styles.rightAction, { backgroundColor: 'red' }]}
                 onPress={() => {
-                Alert.alert(
-                    'Excluir foto',
-                    'Deseja realmente excluir esta Foto ?',
-                    [
-                        {
-                            text: "Não", style: 'cancel',
-                            onPress: () => { }
-                        },
-                        {
-                            text: 'Sim', style: 'destructive',
-                            onPress: () => {
-                                db.transaction((tx) => {
-                                    tx.executeSql("delete from fotoimg where id = (?)", [data.item.id]);
-                                });
-                                onRefresh();
+                    Alert.alert(
+                        'Excluir foto',
+                        'Deseja realmente excluir esta Foto ?',
+                        [
+                            {
+                                text: "Não", style: 'cancel',
+                                onPress: () => { }
+                            },
+                            {
+                                text: 'Sim', style: 'destructive',
+                                onPress: () => {
+                                    db.transaction((tx) => {
+                                        tx.executeSql("delete from fotoimg where id = (?)", [data.item.id]);
+                                    });
+                                    onRefresh();
+                                }
                             }
-                        }
-                    ]
-                );
-            }} 
+                        ]
+                    );
+                }}
             >
                 <Image
                     source={require('./tash.png')}
                     style={{ width: 60, height: 60 }}
                 />
-            </TouchableOpacity>            
+            </TouchableOpacity>
         )
     }
+
+//  <Button title='Carregar imagem' color="#2196F3" mode="contained" onPress={chooseImage} />
 
     return (
         <SafeAreaView style={styles.container}>
             <ListContext.Provider value={{ setBusy: setBusy, listItemView: listItemView }}>
                 <View style={styles.topo}>
-                    <Button title='Carregar imagem' color="#2196F3" mode="contained" onPress={chooseImage} />
+                    <TouchableOpacity style={styles.btnCadastro} onPress={chooseImage}>
+                        <Text style={{ color: 'white', textAlign: 'center' }}>
+                        Carregar imagem
+                        </Text>
+                    </TouchableOpacity>                  
                     <SwipeListView
                         data={data}
                         renderItem={({ item }) => listItemView(item)}
@@ -171,9 +177,10 @@ export default function GaleriaFoto({ navigation, route }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#2728D',
         alignItems: 'center',
         justifyContent: 'center',
+        padding: 20
     },
     imagemContainer: {
         flex: 0,
@@ -186,7 +193,7 @@ const styles = StyleSheet.create({
         height: 180,
     },
     topo: {
-        marginTop: 30,
+        marginTop: 20,
         width: "100%",
     },
     itemFundo: {
@@ -199,4 +206,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 4,
     },
+    btnCadastro: {
+        width: '100%',
+        height: 40,
+        backgroundColor: '#7b42f5',
+        borderRadius: 20,
+        justifyContent: 'center'
+    },    
 });

@@ -76,12 +76,11 @@ export default function CadastroLugar({ navigation, route }) {
                 <Text style={{ color: 'white', textAlign: 'center' }}>
                     Cadastrar
                 </Text>
-            </TouchableOpacity>
-            <Button title='Exibir todos' onPress={showAll} />
+            </TouchableOpacity>          
         </View >
     );
 }
-
+  // <Button title='Exibir todos' onPress={showAll} />
 const styles = StyleSheet.create({
     container: {
         flex: 1,

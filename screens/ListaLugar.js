@@ -79,7 +79,7 @@ export default function ListaLugar({ navigation, route }) {
     const BackitemLista = (data, rowMap) => (
         <View style={styles.itemFundo}>
             <DelButton data={data} rowMap={rowMap} />
-            <Button title="Editar" style={{ right: 0 }} color="steelblue" />
+            <EditButton data={data}/>
         </View>
     );
 
@@ -143,6 +143,17 @@ export default function ListaLugar({ navigation, route }) {
             }} />
         )
     }
+
+    const EditButton = ({data}) => {
+        const listProvider = useContext(ListContext);
+
+        const carregar = () => {
+          listProvider.navigation.navigate('editarlugar', { id: data.item.id });
+        }
+          return(
+              <Button title="Editar" style={{ right: 0 }} color="steelblue" id={data.item.id} onPress={carregar}/>
+          )
+        }
 
     return (
         <SafeAreaView style={styles.container}>
