@@ -1,26 +1,24 @@
-import { StatusBar } from "expo-status-bar";
-import { SafeAreaView, Text, StyleSheet, TextInput, TouchableOpacity, View, Alert } from "react-native";
-import * as yup from "yup";
+import { StatusBar } from 'expo-status-bar';
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
 import * as SQLite from 'expo-sqlite';
-import { useEffect, useState } from "react";
+import * as yup from "yup";
 
-const db = SQLite.openDatabase("local.db");
+const db = SQLite.openDatabase("cadviagem.db");
 
 export default function EditarViagem({ navigation, route }) {
     const [nome, setNome] = useState('');
-    const [descricao, setDescricao] = useState('');
-    const [date, setDate] = useState('');
-
-    //<Text>Atualize a entrada com id: {route.params?.id}</Text>
+    const [inicio, setInicio] = useState('');
+    const [fim, setFim] = useState('');
 
     useEffect(() => {
         if (route.params?.id !== null) {
             db.transaction((tx) => {
                 tx.executeSql(
-                    'SELECT * FROM local WHERE ID = (?)', [route.params?.id], (_, { rows }) => {
+                    'SELECT * FROM CADVIAGEM WHERE ID = (?)', [route.params?.id], (_, { rows }) => {
                         setNome(rows._array[0].nome),
-                        setDescricao(rows._array[0].descricao),
-                        setDate(rows._array[0].data)
+                            setInicio(rows._array[0].inicio),
+                            setFim(rows._array[0].fim)
                     });
             });
         } else {
@@ -32,13 +30,12 @@ export default function EditarViagem({ navigation, route }) {
         try {
             const schema = yup.object().shape({
                 nome: yup.string().required("Por favor, informe o Local."),
-                descricao: yup.string().required("Por favor, informe uma Descrição."),
-                date: yup.string().required("Por favor, informe uma Data."),
+                inicio: yup.string().required("Por favor, informe uma Data."),
             })
 
-            await schema.validate({ nome, descricao, date })
+            await schema.validate({ nome, inicio })
 
-            updateLugar();
+            updateViagem();
         } catch (error) {
             if (error instanceof yup.ValidationError) {
                 Alert.alert(error.message)
@@ -46,9 +43,9 @@ export default function EditarViagem({ navigation, route }) {
         }
     }
 
-    const updateLugar = () => {
+    const updateViagem = () => {
         db.transaction((tx) => {
-            tx.executeSql("update local set nome = (?), descricao = (?), data = (?) where id = (?)", [nome, descricao, date,route.params?.id], (tx, results) => {
+            tx.executeSql("update cadviagem set nome = (?), inicio = (?), fim = (?) where id = (?)", [nome, inicio, fim, route.params?.id], (tx, results) => {
                 if (results.rows._array.length > 0) {
                     alert('ERROR.')
                 }
@@ -56,15 +53,15 @@ export default function EditarViagem({ navigation, route }) {
 
                 }
             });
-            navigation.navigate("listalugar", { atualizar: true });
+            navigation.navigate("home", { atualizar: true });
         })
-    }    
+    }
 
     return (
         <View style={styles.container}>
-            <TextInput value={nome} placeholder="Lugar" style={styles.textInput} onChangeText={text => setNome(text)} />
-            <TextInput value={descricao} placeholder="Descrição" style={styles.textInput} onChangeText={text => setDescricao(text)} />
-            <TextInput value={date} placeholder="Data" style={styles.textInput} onChangeText={text => setDate(text)} />
+            <TextInput value={nome} placeholder="Viagem" style={styles.textInput} onChangeText={text => setNome(text)} />
+            <TextInput value={inicio} placeholder="Inicio" style={styles.textInput} onChangeText={text => setInicio(text)} />
+            <TextInput value={fim} placeholder="Fim" style={styles.textInput} onChangeText={text => setFim(text)} />
             <StatusBar style="auto" />
             <TouchableOpacity style={styles.btnCadastro} onPress={handleSendForm}>
                 <Text style={{ color: 'white', textAlign: 'center' }}>

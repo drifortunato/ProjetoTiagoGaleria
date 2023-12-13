@@ -29,7 +29,7 @@ export default function Home({ navigation }) {
     }
 
     useEffect(() => {
-        // autenticar(),
+        autenticar(),
         db.transaction((tx) => {
             tx.executeSql("create table if not exists cadviagem (id integer primary key not null, nome text not null, inicio text not null, fim text not null)");
         });
@@ -89,7 +89,7 @@ export default function Home({ navigation }) {
     const BackitemLista = (data, rowMap) => (
         <View style={styles.itemFundo}>
             <DelButton data={data} rowMap={rowMap} />
-            <Button title="Editar" style={{ right: 0 }} color="steelblue" />
+            <EditButton data={data} />
         </View>
     );
 
@@ -126,6 +126,31 @@ export default function Home({ navigation }) {
                     style={{ width: 40, height: 40 }}
                 />
             </TouchableOpacity>
+
+        )
+    }
+
+    // <Button title="Editar" style={{ right: 0 }} color="steelblue" id={data.item.id} onPress={carregar} />
+
+    const EditButton = ({ data }) => {
+        const listProvider = useContext(ListContext);
+
+        const carregar = () => {
+            listProvider.navigation.navigate('editarviagem', { id: data.item.id });
+        }
+        return (
+            <TouchableOpacity
+                style={[styles.rightAction, { backgroundColor: 'steelblue' }]}
+                onPress={carregar}
+                id={data.item.id}
+            >
+                <Image
+                    source={require('./pen.png')}
+                    style={{ width: 40, height: 40 }}
+                />
+            </TouchableOpacity>
+
+
 
         )
     }
@@ -184,8 +209,8 @@ const styles = StyleSheet.create({
         padding: 10,
         flex: 1,
         justifyContent: 'center',
-        height: 60,               
-    },    
+        height: 60,
+    },
     titleStyle: {
         fontSize: 28,
         fontWeight: 'bold',
