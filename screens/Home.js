@@ -8,7 +8,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 
 const Stack = createNativeStackNavigator();
 const ListContext = createContext(null);
-const db = SQLite.openDatabase("viagem.db");
+const db = SQLite.openDatabase("cadviagem.db");
 
 
 export default function Home({ navigation }) {
@@ -31,7 +31,7 @@ export default function Home({ navigation }) {
     useEffect(() => {
         // autenticar(),
         db.transaction((tx) => {
-            tx.executeSql("create table if not exists viagem (id integer primary key not null, nome text not null, inicio text not null, fim text not null)");
+            tx.executeSql("create table if not exists cadviagem (id integer primary key not null, nome text not null, inicio text not null, fim text not null)");
         });
     }, []);
 
@@ -41,7 +41,7 @@ export default function Home({ navigation }) {
         if (update || route.params?.atualizar || autenticado) {
             db.transaction((tx) => {
                 tx.executeSql(
-                    'SELECT * FROM VIAGEM',
+                    'SELECT * FROM CADVIAGEM',
                     [],
                     (tx, results) => {
                         var temp = [];
@@ -74,7 +74,12 @@ export default function Home({ navigation }) {
                             Viagem :
                             <Text style={styles.innerText}> {item.nome}</Text>
                         </Text>
-                        <Text style={styles.textStyle}>Inicio : {item.inicio}   Fim : {item.fim}</Text>
+                        <Text style={styles.baseText}>
+                            Início :
+                            <Text style={styles.innerText}> {item.inicio}      </Text>
+                            Fim :
+                            <Text style={styles.innerText}> {item.fim}</Text>
+                        </Text>
                     </View>
                 </Pressable>
             </View >
@@ -106,7 +111,7 @@ export default function Home({ navigation }) {
                                 text: 'Sim', style: 'destructive',
                                 onPress: () => {
                                     db.transaction((tx) => {
-                                        tx.executeSql("delete from viagem where id = (?)", [data.item.id]);
+                                        tx.executeSql("delete from cadviagem where id = (?)", [data.item.id]);
                                     });
                                     closeRow(rowMap, data.item.id);
                                     setUpdate(true);

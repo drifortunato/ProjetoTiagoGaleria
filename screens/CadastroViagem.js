@@ -1,25 +1,45 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useState } from 'react';
 import * as SQLite from 'expo-sqlite';
 import { useRoute } from '@react-navigation/native';
+import * as yup from "yup";
 
-const db = SQLite.openDatabase("viagem.db");
+const db = SQLite.openDatabase("cadviagem.db");
 
 export default function CadastroViagem({ navigation }) {
     const [nome, setNome] = useState('');
+    const [inicio, setInicio] = useState('');
+    const [fim, setFim] = useState('');
     const [total, setTotal] = useState(0);
+
+    async function handleSendForm() {
+        try {
+            const schema = yup.object().shape({
+                nome: yup.string().required("Por favor, informe a Viagem."),
+                inicio : yup.string().required("Por favor, informe a Data de inicio."), 
+            })
+
+            await schema.validate({ nome, inicio })
+
+            addViagem();
+        } catch (error) {
+            if (error instanceof yup.ValidationError) {
+                Alert.alert(error.message)
+            }
+        }
+    }
 
     const updateTotal = () => {
         db.transaction((tx) => {
-            tx.executeSql("select count(id) as total from viagem", [], (_, { rows }) =>
+            tx.executeSql("select count(id) as total from cadviagem", [], (_, { rows }) =>
                 setTotal(rows._array[0].total));
         })
     }
 
     const addViagem = () => {
         db.transaction((tx) => {
-            tx.executeSql("insert into viagem (nome) values (?)", [nome]);
+            tx.executeSql("insert into cadviagem (nome,inicio,fim) values (?,?,?)", [nome, inicio, fim]);
         });
         updateTotal();
         navigation.navigate("home", { atualizar: true });
@@ -32,8 +52,10 @@ export default function CadastroViagem({ navigation }) {
     return (
         <View style={styles.container}>
             <TextInput placeholder="Viagem" style={styles.textInput} onChangeText={text => setNome(text)} />
+            <TextInput placeholder="Inicio" style={styles.textInput} onChangeText={text => setInicio(text)} />
+            <TextInput placeholder="Fim" style={styles.textInput} onChangeText={text => setFim(text)} />
             <StatusBar style="auto" />
-            <TouchableOpacity style={styles.btnCadastro} onPress={addViagem}>
+            <TouchableOpacity style={styles.btnCadastro} onPress={handleSendForm}>
                 <Text style={{ color: 'white', textAlign: 'center' }}>
                     Cadastrar
                 </Text>

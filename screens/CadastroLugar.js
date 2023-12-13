@@ -1,16 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useEffect, useState } from 'react';
 import * as SQLite from 'expo-sqlite';
 import * as yup from "yup";
-import { Controller, useForm } from "react-hook-form";
-import { yupResolver } from '@hookform/resolvers/yup';
 import { useRoute } from '@react-navigation/native';
-
-const schema = yup.object({
-    lugar: yup.string().required('Por favor, informe um Lugar que visitou.'),
-}).required();
-
 
 const db = SQLite.openDatabase("local.db");
 
@@ -27,6 +20,24 @@ export default function CadastroLugar({ navigation, route }) {
                 setTotal(rows._array[0].total));
         })
     }
+
+    async function handleSendForm() {
+        try {
+            const schema = yup.object().shape({
+                nome: yup.string().required("Por favor, informe o Local."),
+                descricao : yup.string().required("Por favor, informe uma Descrição."), 
+                date : yup.string().required("Por favor, informe uma Data."), 
+            })
+
+            await schema.validate({ nome, descricao, date })
+
+            addLugar();
+        } catch (error) {
+            if (error instanceof yup.ValidationError) {
+                Alert.alert(error.message)
+            }
+        }
+    }    
 
     useEffect(() => {
         setIdviagem(route.params?.idV);
@@ -61,7 +72,7 @@ export default function CadastroLugar({ navigation, route }) {
             <TextInput placeholder="Descrição" style={styles.textInput} onChangeText={text => setDescricao(text)} />
             <TextInput placeholder="Data" style={styles.textInput} onChangeText={text => setDate(text)} />
             <StatusBar style="auto" />
-            <TouchableOpacity style={styles.btnCadastro} onPress={addLugar}>
+            <TouchableOpacity style={styles.btnCadastro} onPress={handleSendForm}>
                 <Text style={{ color: 'white', textAlign: 'center' }}>
                     Cadastrar
                 </Text>
