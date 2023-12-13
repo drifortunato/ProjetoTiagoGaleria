@@ -118,7 +118,7 @@ export default function Home({ navigation }) {
             >
                 <Image
                     source={require('./tash.png')}
-                    style={{ width: 50, height: 50 }}
+                    style={{ width: 40, height: 40 }}
                 />
             </TouchableOpacity>
 
