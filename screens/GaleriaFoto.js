@@ -140,10 +140,6 @@ export default function GaleriaFoto({ navigation, route }) {
                 );
             }} 
             >
-                <Image
-                    source={require('./tash.png')}
-                    style={{ width: 40, height: 40 }}
-                />
             </TouchableOpacity>            
         )
     }
